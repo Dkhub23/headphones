@@ -1,0 +1,315 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>WH-1000XM6 Scrollytelling</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout concept: one pinned full-viewport canvas on a 700vh track; copy beats slide in from the left, right and centre over it, then a short specs band and footer. */
+:root{
+  --bg:#050505;
+  --bg-2:#0a0a0c;
+  --fg:rgba(255,255,255,.9);
+  --muted:rgba(255,255,255,.6);
+  --line:rgba(255,255,255,.1);
+  --blue:#0050ff;
+  --cyan:#00d6ff;
+  --glow:#050815;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:auto;background:var(--bg)}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+
+/* NAV */
+.nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:50;height:48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  background:rgba(5,5,5,0);border-bottom:1px solid transparent;
+  transition:background .5s ease,border-color .5s ease,backdrop-filter .5s ease}
+.nav.on{background:rgba(5,5,5,.75);border-color:var(--line);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px)}
+.brand{font-weight:600;font-size:15px;letter-spacing:-.01em;white-space:nowrap;background:none;border:0;color:var(--fg);cursor:pointer;padding:0}
+.links{display:flex;gap:30px;list-style:none;margin:0;padding:0}
+.links button{background:none;border:0;color:var(--muted);font-size:13px;letter-spacing:-.005em;cursor:pointer;padding:6px 0;position:relative;transition:color .25s}
+.links button::after{content:"";position:absolute;left:0;right:0;bottom:2px;height:1px;background:linear-gradient(90deg,var(--blue),var(--cyan));transform:scaleX(0);transform-origin:left;transition:transform .35s ease}
+.links button:hover,.links button:focus-visible{color:var(--fg)}
+.links button:hover::after,.links button:focus-visible::after{transform:scaleX(1)}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:0;cursor:pointer;color:#fff;font-weight:600;letter-spacing:-.005em;
+  text-shadow:0 1px 2px rgba(0,0,0,.35);border-radius:999px;position:relative;white-space:nowrap;
+  background:linear-gradient(var(--bg-2),var(--bg-2)) padding-box,linear-gradient(120deg,var(--blue),var(--cyan)) border-box;border:1px solid transparent;
+  transition:box-shadow .35s ease,transform .35s ease}
+.btn:hover,.btn:focus-visible{box-shadow:0 0 28px rgba(0,214,255,.28),0 0 12px rgba(0,80,255,.45)}
+.btn.sm{height:30px;padding:0 15px;font-size:12.5px}
+.btn.lg{height:52px;padding:0 30px;font-size:16px;background:linear-gradient(120deg,var(--blue),var(--cyan)) border-box;box-shadow:0 10px 40px rgba(0,80,255,.35),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn.lg:hover{transform:translateY(-1px);box-shadow:0 14px 50px rgba(0,214,255,.35),inset 0 1px 0 rgba(255,255,255,.3)}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+/* TRACK */
+.track{position:relative;height:700vh}
+.stage{position:sticky;top:0;height:100vh;height:100svh;width:100%;overflow:hidden;background:radial-gradient(ellipse 60% 60% at 50% 50%,var(--glow) 0%,var(--bg) 70%)}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block;
+  -webkit-mask-image:radial-gradient(ellipse 72% 78% at 50% 50%,#000 58%,transparent 100%);
+          mask-image:radial-gradient(ellipse 72% 78% at 50% 50%,#000 58%,transparent 100%)}
+.grid{position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:calc(100%/12) 100%,100% 25%;
+  -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,transparent 30%,#000 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,transparent 30%,#000 100%);
+  opacity:.12}
+
+/* BEATS */
+.beat{position:absolute;opacity:0;will-change:opacity,transform;pointer-events:none}
+.beat.live{pointer-events:auto}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);margin:0 0 18px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:22px;height:1px;background:linear-gradient(90deg,var(--blue),var(--cyan))}
+h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.035em;line-height:1.02;text-wrap:balance;
+  background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,.92) 62%,#bff1ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 28px rgba(0,120,255,.18))}
+h1{font-size:clamp(44px,7.6vw,108px)}
+h2{font-size:clamp(34px,5vw,68px)}
+.sub{font-size:clamp(20px,2.4vw,32px);font-weight:500;letter-spacing:-.02em;color:var(--fg);margin:22px 0 0}
+p.body{color:var(--muted);margin:0;max-width:46ch;text-wrap:pretty}
+.stack{display:flex;flex-direction:column;gap:14px;margin-top:26px}
+.ticks{list-style:none;margin:28px 0 0;padding:0;display:flex;flex-direction:column;gap:0}
+.ticks li{color:var(--muted);padding:14px 0;border-top:1px solid var(--line);display:flex;gap:14px;max-width:46ch}
+.ticks li::before{content:"";flex:none;width:6px;height:6px;margin-top:.7em;border-radius:50%;background:linear-gradient(120deg,var(--blue),var(--cyan));box-shadow:0 0 10px rgba(0,214,255,.6)}
+
+.b-hero{left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;
+  padding:0 max(16px,env(safe-area-inset-left,0px)) 5vh}
+.b-hero .tag{margin-top:18px;max-width:44ch;color:var(--muted);font-size:clamp(15px,1.4vw,18px)}
+.hint{margin-top:28px;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.hint i{width:1px;height:38px;background:linear-gradient(var(--cyan),transparent);animation:drip 2.2s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+.b-left,.b-right{top:50%;width:min(480px,40vw)}
+.b-left{left:max(16px,env(safe-area-inset-left,0px));margin-left:min(7vw,110px)}
+.b-left::before,.b-right::before{content:"";position:absolute;z-index:-1;top:-18%;bottom:-18%;left:-16%;right:-16%;pointer-events:none;
+  background:radial-gradient(ellipse 60% 55% at 50% 50%,rgba(5,5,5,.88) 0%,rgba(5,5,5,.72) 50%,rgba(5,5,5,0) 100%)}
+.b-right{right:max(16px,env(safe-area-inset-right,0px));margin-right:min(7vw,110px);text-align:left}
+.b-cta{left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;padding:0 max(16px,env(safe-area-inset-left,0px)) 8vh}
+.b-cta .body{margin:20px auto 0}
+.cta-row{display:flex;gap:26px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:30px}
+.link{color:var(--fg);font-weight:500;font-size:16px;border-bottom:1px solid var(--line);padding-bottom:2px;background:none;border-top:0;border-left:0;border-right:0;cursor:pointer;transition:border-color .3s,color .3s}
+.link:hover{border-color:var(--cyan);color:#fff}
+.micro{margin-top:26px;font-size:12px;letter-spacing:.04em;color:rgba(255,255,255,.4)}
+
+.rail{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);width:2px;height:120px;background:var(--line);border-radius:2px;overflow:hidden;z-index:5}
+.rail i{display:block;width:100%;height:100%;background:linear-gradient(var(--blue),var(--cyan));transform-origin:top;transform:scaleY(0)}
+
+/* LOADER */
+.loader{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity .8s ease,visibility .8s}
+.loader.done{opacity:0;visibility:hidden}
+.loader b{font-weight:600;letter-spacing:.2em;font-size:12px;text-transform:uppercase;color:var(--muted)}
+.bar{width:160px;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));transform:scaleX(0);transform-origin:left}
+
+/* SPECS */
+.specs{background:var(--bg-2);border-top:1px solid var(--line);padding-block:clamp(80px,12vw,160px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1120px;margin:0 auto}
+.specs h2{max-width:14ch}
+.spec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:clamp(44px,6vw,80px);border-top:1px solid var(--line)}
+.spec{padding:28px 24px 28px 0;border-bottom:1px solid var(--line);min-width:0}
+.spec strong{display:block;font-size:clamp(38px,4.6vw,60px);font-weight:700;letter-spacing:-.04em;line-height:1;background:linear-gradient(180deg,#fff,#9fe9ff);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.spec strong small{font-size:.4em;letter-spacing:-.01em;font-weight:600;margin-left:6px}
+.spec span{display:block;margin-top:12px;color:var(--muted);font-size:15px;line-height:1.5}
+.note{margin-top:28px;font-size:12px;color:rgba(255,255,255,.4)}
+footer{padding:36px max(16px,env(safe-area-inset-right,0px));text-align:center;font-size:12px;color:rgba(255,255,255,.4);background:var(--bg);border-top:1px solid var(--line)}
+
+@media (max-width:860px){
+  .links{display:none}
+  .b-left::before,.b-right::before{display:none}
+  .b-left,.b-right{left:0;right:0;top:auto;bottom:0;width:auto;margin:0;padding:64px max(20px,env(safe-area-inset-left,0px)) 7vh;
+    background:linear-gradient(transparent,rgba(5,5,5,.88) 40%,rgba(5,5,5,.96))}
+  .b-left h2,.b-right h2{font-size:clamp(30px,8.5vw,44px)}
+  .ticks li{padding:10px 0;font-size:15px}
+  .rail{display:none}
+}
+@media (prefers-reduced-motion:reduce){.hint i{animation:none}.nav,.btn,.link{transition:none}}
+</style>
+
+<div class="loader" id="loader" role="status" aria-live="polite"><b>WH-1000XM6</b><div class="bar"><i id="lbar"></i></div></div>
+
+<nav class="nav" id="nav" aria-label="Primary">
+  <button class="brand" data-go="0">WH-1000XM6</button>
+  <ul class="links">
+    <li><button data-go="0">Overview</button></li>
+    <li><button data-go=".16">Technology</button></li>
+    <li><button data-go=".42">Noise Cancelling</button></li>
+    <li><button data-go="specs">Specs</button></li>
+    <li><button data-go=".96">Buy</button></li>
+  </ul>
+  <button class="btn sm" data-go=".96">Experience WH-1000XM6</button>
+</nav>
+
+<main>
+<section class="track" id="track" aria-label="WH-1000XM6 product story">
+  <div class="stage">
+    <canvas id="cv" role="img" aria-label="Sony WH-1000XM6 headphones disassembling into an exploded technical view and reassembling"></canvas>
+    <div class="grid"></div>
+    <div class="rail" aria-hidden="true"><i id="rail"></i></div>
+
+    <div class="beat b-hero" data-a="-1" data-b="-1" data-c=".07" data-d=".13" data-dir="up">
+      <h1>Sony WH-1000XM6</h1>
+      <p class="sub">Silence, perfected.</p>
+      <p class="tag">Flagship wireless noise cancelling, re-engineered for a world that never stops.</p>
+      <div class="hint"><span>Scroll</span><i></i></div>
+    </div>
+
+    <div class="beat b-left" data-a=".14" data-b=".19" data-c=".33" data-d=".38" data-dir="left">
+      <p class="eyebrow">Engineering</p>
+      <h2>Precision-engineered for silence.</h2>
+      <div class="stack">
+        <p class="body">Custom drivers, sealed acoustic chambers, and optimized airflow deliver studio-grade clarity.</p>
+        <p class="body">Every component is tuned for balance, power, and comfort, hour after hour.</p>
+      </div>
+    </div>
+
+    <div class="beat b-right" data-a=".40" data-b=".45" data-c=".57" data-d=".62" data-dir="right">
+      <p class="eyebrow">Noise cancelling</p>
+      <h2>Adaptive noise cancelling, redefined.</h2>
+      <ul class="ticks">
+        <li>Multi-microphone array listens in every direction.</li>
+        <li>Real-time noise analysis adjusts to your environment.</li>
+        <li>Your music stays pure. Planes, trains, and crowds fade away.</li>
+      </ul>
+    </div>
+
+    <div class="beat b-left" data-a=".63" data-b=".68" data-c=".77" data-d=".82" data-dir="left">
+      <p class="eyebrow">Sound</p>
+      <h2>Immersive, lifelike sound.</h2>
+      <div class="stack">
+        <p class="body">High-performance drivers unlock detail, depth, and texture in every track.</p>
+        <p class="body">AI-enhanced upscaling restores clarity to compressed audio, so every note feels alive.</p>
+      </div>
+    </div>
+
+    <div class="beat b-cta" data-a=".88" data-b=".93" data-c="2" data-d="3" data-dir="up">
+      <h2>Hear everything.<br>Feel nothing else.</h2>
+      <p class="sub">WH-1000XM6. Designed for focus, crafted for comfort.</p>
+      <div class="cta-row">
+        <button class="btn lg" type="button" data-go="specs">Experience WH-1000XM6</button>
+        <button class="link" type="button" data-go="specs">See full specs</button>
+      </div>
+      <p class="micro">Engineered for airports, offices, and everything in between.</p>
+    </div>
+  </div>
+</section>
+
+<section class="specs" id="specs" aria-labelledby="sp">
+  <div class="wrap">
+    <p class="eyebrow">Specs</p>
+    <h2 id="sp">Built to disappear.</h2>
+    <div class="spec-grid">
+      <div class="spec"><strong>12<small>mics</small></strong><span>Microphones working together to listen for noise and capture your voice.</span></div>
+      <div class="spec"><strong>QN3</strong><span>Noise-cancelling processor that analyses your surroundings in real time.</span></div>
+      <div class="spec"><strong>30<small>hours</small></strong><span>Battery life with noise cancelling on. A short charge brings hours back.</span></div>
+      <div class="spec"><strong>LDAC</strong><span>High-resolution wireless audio, plus upscaling for compressed tracks.</span></div>
+    </div>
+    <p class="note">Figures are indicative. Check Sony's product page for current specifications and pricing.</p>
+  </div>
+</section>
+</main>
+<footer>WH-1000XM6 scrollytelling concept. Product names belong to their owners.</footer>
+
+<script>
+(function(){
+  var N=112, PATH='frames/f', EXT='.webp';
+  var track=document.getElementById('track'), cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+  var nav=document.getElementById('nav'), beats=[].slice.call(document.querySelectorAll('.beat'));
+  var rail=document.getElementById('rail'), loader=document.getElementById('loader'), lbar=document.getElementById('lbar');
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var imgs=new Array(N), loaded=0, W=0,H=0,DPR=1;
+
+  function pad(n){return ('00'+n).slice(-3)}
+  function load(i,cb){var im=new Image();im.decoding='async';im.onload=im.onerror=function(){loaded++;lbar.style.transform='scaleX('+(loaded/N)+')';cb&&cb()};im.src=PATH+pad(i+1)+EXT;imgs[i]=im}
+  var pending=N;
+  for(var i=0;i<N;i++)load(i,function(){if(--pending===0){ready()}});
+
+  function resize(){
+    DPR=Math.min(window.devicePixelRatio||1,2);
+    W=cv.clientWidth;H=cv.clientHeight;
+    cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
+    last=-1;draw(cur);
+  }
+  var cur=0,tgt=0,last=-1;
+  function cover(im,alpha){
+    if(!im||!im.naturalWidth)return;
+    var iw=im.naturalWidth,ih=im.naturalHeight,cw=cv.width,ch=cv.height;
+    var s=Math.max(cw/iw,ch/ih),w=iw*s,h=ih*s;
+    ctx.globalAlpha=alpha;ctx.drawImage(im,(cw-w)/2,(ch-h)/2-ch*0.055,w,h);
+  }
+  function draw(f){
+    var a=Math.floor(f),b=Math.min(N-1,a+1),t=f-a;
+    ctx.globalAlpha=1;ctx.fillStyle='#0a0d0e';ctx.fillRect(0,0,cv.width,cv.height);
+    cover(imgs[a],1);
+    if(t>.01&&b!==a)cover(imgs[b],t);
+    ctx.globalAlpha=1;
+  }
+
+  function ease(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2}
+  function frameAt(p){
+    var m=N-1;
+    if(p<.12)return m*0.18*(p/.12);                       // hero: slow drift while still assembled
+    if(p<.70)return m*(0.18+0.82*((p-.12)/.58));          // explosion
+    if(p<.80)return m;                                    // hold at peak
+    return m*(1-ease(Math.min(1,(p-.80)/.15)));           // reassemble (reverse playback)
+  }
+  function progress(){
+    var r=track.getBoundingClientRect(),max=track.offsetHeight-window.innerHeight;
+    return Math.max(0,Math.min(1,-r.top/max));
+  }
+  var prog=0;
+  function smooth(x){return x<=0?0:x>=1?1:x*x*(3-2*x)}
+  function beatsUpdate(p){
+    for(var i=0;i<beats.length;i++){
+      var el=beats[i],a=+el.dataset.a,b=+el.dataset.b,c=+el.dataset.c,d=+el.dataset.d,dir=el.dataset.dir;
+      var o=1;
+      if(p<b)o=smooth((p-a)/(b-a)); else if(p>c)o=1-smooth((p-c)/(d-c));
+      var k=(p<(b+c)/2)?1-o:-(1-o);   // negative when leaving
+      var tx=0,ty=0,amt=reduce?0:1;
+      if(dir==='left')tx=-48*(1-o)*amt; else if(dir==='right')tx=48*(1-o)*amt; else ty=(p<(b+c)/2?1:-1)*28*(1-o)*amt;
+      if(dir==='left'&&p>c)tx=-24*(1-o)*amt; if(dir==='right'&&p>c)tx=24*(1-o)*amt;
+      el.style.opacity=o.toFixed(3);
+      var base=(el.classList.contains('b-left')||el.classList.contains('b-right'))&&window.innerWidth>860?'translateY(-50%) ':'';
+      el.style.transform=base+'translate3d('+tx.toFixed(1)+'px,'+ty.toFixed(1)+'px,0)';
+      el.classList.toggle('live',o>.5);
+    }
+  }
+
+  var running=false,lastT=0;
+  function tick(ts){
+    var dt=Math.min(.05,(ts-lastT)/1000||.016);lastT=ts;
+    prog=progress();tgt=frameAt(prog);
+    var k=reduce?1:1-Math.pow(.0009,dt);           // frame-rate independent easing
+    cur+=(tgt-cur)*k;
+    if(Math.abs(tgt-cur)<.003)cur=tgt;
+    var q=Math.round(cur*50)/50;
+    if(q!==last){draw(q);last=q}
+    rail.style.transform='scaleY('+prog.toFixed(4)+')';
+    beatsUpdate(prog);
+    nav.classList.toggle('on',window.scrollY>40);
+    requestAnimationFrame(tick);
+  }
+  function ready(){
+    resize();
+    loader.classList.add('done');
+    if(!running){running=true;requestAnimationFrame(tick)}
+  }
+  window.addEventListener('resize',resize);
+
+  /* navigation */
+  function go(v){
+    var max=track.offsetHeight-window.innerHeight, top=track.getBoundingClientRect().top+window.scrollY, y;
+    if(v==='specs')y=document.getElementById('specs').getBoundingClientRect().top+window.scrollY;
+    else y=top+max*parseFloat(v);
+    window.scrollTo({top:y,behavior:reduce?'auto':'smooth'});
+  }
+  document.addEventListener('click',function(e){var t=e.target.closest('[data-go]');if(t)go(t.dataset.go)});
+})();
+</script>
+
+</body></html>
